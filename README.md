@@ -1,10 +1,12 @@
-## usage
+## Installation
 
-```
+```bash
 yarn add nuxt-page-caching
 ```
 
-first of all config redis to your machine
+## Usage
+
+First of all config redis to your machine
 if you are using ubuntu there is a good video here is the link:
 https://www.youtube.com/watch?v=gNPgaBugCWk
 
@@ -24,39 +26,48 @@ modules: [
         if (route !== "/") {
           return false;
         }
-        return { key: "my-home-page", expire: 60 * 60 }; //1hour
+        return {
+          key: "my-home-page",
+          expire: 60 * 60,
+          nocache: route.includes("nocache=1"),
+        }; //1hour
       },
     },
   ],
 ];
 ```
 
-## options
+## Options
 
-| Property               | Type     | Required? | Description                                                                        |
-| :--------------------- | :------- | :-------- | :--------------------------------------------------------------------------------- |
-| disable                | boolean  | no        | default is `true` you can disable all module features                              |
-| appendHost             | boolean  | no        | default is `true` append host to the key                                           |
-| ignoreConnectionErrors | boolean  | no        | default is `false` ignore connection errors and render data as normal              |
-| prefix                 | string   | no        | default is `r-` it's redis prefix key                                              |
-| url                    | string   | no        | default is `redis://127.0.0.1:6379` url for redis connection                       |
-| getCacheData           | function | yes       | should return an object include key and expire if return false page will not cache |
+| Property               | Type     | Required? | Description                                                             |
+| :--------------------- | :------- | :-------- | :---------------------------------------------------------------------- |
+| disable                | boolean  | no        | default is `true` you can disable all module features                   |
+| appendHost             | boolean  | no        | default is `true` append host to the key                                |
+| ignoreConnectionErrors | boolean  | no        | default is `false` ignore connection errors and render data as normal   |
+| prefix                 | string   | no        | default is `r-` it's redis prefix key                                   |
+| url                    | string   | no        | default is `redis://127.0.0.1:6379` url for redis connection            |
+| getCacheData           | function | yes       | should return getCacheDataResponse, if return false page will not cache |
 
-#### note
+## getCacheDataResponse
 
-ignoreConnectionErrors added in 1.0.4 version
+| Property | Type    | Required? | Description                                                                                                            |
+| :------- | :------ | :-------- | :--------------------------------------------------------------------------------------------------------------------- |
+| key      | string  | no        | redis cache key, default is `empty`                                                                                    |
+| expire   | number  | no        | redis cache exp time in seconds                                                                                        |
+| nocache  | boolean | no        | set to `true` if don't want to render cached data, also set newest data to redis for others to use, default is `false` |
+| url      | string  | no        | redis uri, to save data to other redis server, default is `empty`                                                      |
 
-## caveat
+## Caveat
 
-**important security warning** : don't load secret keys such as user credential on the server for cached pages.
+**Important security warning** : don't load secret keys such as user credential on the server for cached pages.
 _this is because they will cache for all users!_
 
-### side note
+### Side note
 
-if during test process in your local machine your page start rerender over and over it is not a big deal that is because package changed nuxt render function
+If during test process in your local machine your page start rerender over and over it is not a big deal that is because package changed nuxt render function
 to solve that open a route not include cache in your browser **until build process done**
 
-## api request caching
+## API request caching
 
 ```javascript
 asyncData(ctx) {
@@ -67,46 +78,48 @@ asyncData(ctx) {
   }
 ```
 
-ok let me explain what is happening:
-nuxt-page-caching inject a plugin `cacheFetch` this is a function with two parameters
-the first one get an object include `key` and `expire` for redis
-second parameter is a callback function should return your normal request as a promise
-`cacheFetch` method will check if the process is in the server then check key in redis
-if key exist return data from redis if not call your callback as normal
-this method useful for consistent requests such as menu
+Explain:
 
-## caveat
+- `nuxt-page-caching` inject a plugin `cacheFetch` this is a function with two parameters:
 
-then callback function should return a valid json for `JSON.stringify` method
+  1. The first one get an object include `key` and `expire` for redis
+  2. The second parameter is a callback function should return your normal request as a promise
 
-## features
+- `cacheFetch` method will check if the process is in the server then check key in redis, if key exist return data from redis if not call your callback as normal
+- This method useful for consistent requests such as menu
 
-- easy to use
-- cache whole page in the redis
-- separate expire time for each page
-- api request cache
+## Caveat
 
-## more control
+Callback function should return a valid json for `JSON.stringify` method
 
-to save a page to another redis server just return
-`{key:string,expire:number,url:"my new url"}`
+## Features
+
+- Easy to use
+- Cache whole page in the redis
+- Separate expire time for each page
+- API request cache
+
+## More control
+
+To save a page to another redis server just return
+`{key:string, expire:number, url:"my new url"}`
 inside `getCacheData` method
 
-also, it is possible for `catcheFetch` method here is full object you can pass
-`{ key,expire,disable,url,prefix,ignoreConnectionErrors}`
+Also, it is possible for `catchFetch` method here is full object you can pass
+`{ key, expire, disable, url, prefix, ignoreConnectionErrors}`
 
-for write and read directly you can use two injected methods:
+For write and read directly you can use two injected methods:
 
-`const data = await $cacheRead({ key:'youtKey' })`
+`const data = await $cacheRead({ key:'yourKey' })`
 
-data is null if key is not exist
+Data is `null` if key is not exist
 
-`const flag = await $cacheWrite({ key, expire: 60*60*24 }, 'yout content')`
+`const flag = await $cacheWrite({ key, expire: 60*60*24 }, 'your content')`
 
-flag is false if can not write
+Flag is `false` if can not write
 
-_note that you have to make sure process is in the server for `cacheRead` and `cacheWrite` methods_
+> You have to make sure process is in the server for `cacheRead` and `cacheWrite` methods
 
-## security warning
+## Security warning
 
-just note that you should use private redis server, if you are using a public redis server with a password be aware your password will bundle in client and leaks
+> You should use private redis server, if you are using a public redis server with a password be aware your password will bundle in client and leaks
