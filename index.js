@@ -22,7 +22,7 @@ export default function index({
       if (!cacheData || disable) return renderRoute(route, context);
 
       // eslint-disable-next-line prefer-const
-      let { key, expire } = cacheData;
+      let { key, expire, nocache } = cacheData;
 
       const redisStore = new RedisStore(
         cacheData.url || url,
@@ -48,7 +48,7 @@ export default function index({
       return new Promise(async (resolve) => {
         try {
           const cachedResult = await redisStore.read(key);
-          if (cachedResult) {
+          if (cachedResult && !nocache) {
             resolve(deserialize(cachedResult));
           } else {
             resolve(renderAndSetCacheKey());
