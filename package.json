@@ -1,6 +1,6 @@
 {
   "name": "nuxt-page-caching",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "nuxt page caching and nuxt api cache using redis",
   "main": "index.js",
   "directories": {
@@ -26,8 +26,8 @@
   "license": "MIT",
   "homepage": "https://github.com/thaintp/nuxt-page-caching#readme",
   "dependencies": {
+    "net": "^1.0.2",
     "redis": "^3.0.2",
-    "tls": "^0.0.1",
-    "net": "^1.0.2"
+    "tls": "^0.0.1"
   }
 }
