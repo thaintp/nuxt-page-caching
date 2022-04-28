@@ -1,7 +1,7 @@
 {
-  "name": "nuxt-perfect-cache",
-  "version": "1.1.1",
-  "description": "nuxt page cache and nuxt api cache using redis",
+  "name": "nuxt-page-caching",
+  "version": "1.0.0",
+  "description": "nuxt page caching and nuxt api cache using redis",
   "main": "index.js",
   "directories": {
     "lib": "lib"
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ziaadini/nuxt-perfect-cache.git"
+    "url": "https://github.com/thaintp/nuxt-page-caching.git"
   },
   "keywords": [
     "nuxt",
@@ -24,10 +24,7 @@
   ],
   "author": "ziaadini",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ziaadini/nuxt-perfect-cache/issues"
-  },
-  "homepage": "https://github.com/ziaadini/nuxt-perfect-cache#readme",
+  "homepage": "https://github.com/thaintp/nuxt-page-caching#readme",
   "dependencies": {
     "redis": "^3.0.2",
     "tls": "^0.0.1",
