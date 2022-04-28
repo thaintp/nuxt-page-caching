@@ -46,7 +46,7 @@ modules: [
 | ignoreConnectionErrors | boolean  | no        | default is `false` ignore connection errors and render data as normal   |
 | prefix                 | string   | no        | default is `r-` it's redis prefix key                                   |
 | url                    | string   | no        | default is `redis://127.0.0.1:6379` url for redis connection            |
-| getCacheData           | function | yes       | should return getCacheDataResponse, if return false page will not cache |
+| getCacheData           | function | yes       | should return `getCacheDataResponse`, if return `false` the page will not be cached |
 
 ## getCacheDataResponse
 
