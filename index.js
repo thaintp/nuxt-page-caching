@@ -24,22 +24,21 @@ export default function index({
       // eslint-disable-next-line prefer-const
       let { key, expire, renewCache } = cacheData;
 
-      const redisStore = new RedisStore(
-        cacheData.url || url,
-        false,
-        prefix,
-        true,
-        ignoreConnectionErrors
-      );
+      const useRedisStore = () =>
+        new RedisStore(
+          cacheData.url || url,
+          false,
+          prefix,
+          true,
+          ignoreConnectionErrors
+        );
 
       function renderAndSetCacheKey() {
         return renderRoute(route, context).then(async function (result) {
           if (!result.error && !result.redirected) {
-            await redisStore.write(
-              getKey({ appendHost, req: context.req, key }),
-              serialize(result),
-              expire
-            );
+            const redisKey = getKey({ appendHost, req: context.req, key });
+            const value = serialize(result);
+            await useRedisStore().write(redisKey, value, expire, true);
           }
           return result;
         });
@@ -47,7 +46,7 @@ export default function index({
 
       return new Promise(async (resolve) => {
         try {
-          const cachedResult = await redisStore.read(key);
+          const cachedResult = await useRedisStore().read(key, true);
           if (cachedResult && !renewCache) {
             resolve(deserialize(cachedResult));
           } else {
@@ -56,8 +55,6 @@ export default function index({
         } catch {
           resolve(renderRoute(route, context));
         }
-      }).finally(() => {
-        redisStore.disconnect();
       });
     };
   });
