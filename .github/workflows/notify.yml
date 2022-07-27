@@ -1,0 +1,42 @@
+name: CI notify
+
+# Only trigger, when the build workflow succeeded
+on:
+  workflow_run:
+    workflows: [CI deploy]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  send-notification:
+    name: "Send notification"
+    runs-on: ubuntu-latest
+
+    strategy:
+      max-parallel: 1
+      matrix:
+        include:
+          - subject: Aha Github Actions success
+            attachments: package.json
+            body: Build job of ${{github.repository}}
+            priority: high
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.mandrillapp.com
+          server_port: 465
+          username: Aha-Actions-Bot
+          password: jZCfo1jeJEAqV8ps7myugw
+          subject: ${{matrix.subject}}
+          # to: aha_team@dgroup.co
+          to: thaintp@dgroup.co
+          from: Aha-Actions-Bot <aha-actions-bot@dgroup.co>
+          attachments: ${{matrix.attachments}}
+          body: ${{matrix.body}}
+          priority: ${{matrix.priority}}
