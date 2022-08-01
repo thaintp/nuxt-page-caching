@@ -1,8 +1,8 @@
 name: CI deploy
 
 on:
-  push:
-    branches: [main]
+  repository_dispatch:
+    types: [argocd-sync-success]
 
 jobs:
   update-image:
