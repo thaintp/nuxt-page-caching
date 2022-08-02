@@ -1,8 +1,12 @@
-name: CI deploy
+name: E2E Testing
 
 on:
   repository_dispatch:
     types: [ahadev-sync-success]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   ui-test:
@@ -28,7 +32,7 @@ jobs:
         run: yarn --prefer-offline --frozen-lockfile --non-interactive
 
       - name: Run tests
-        run: yarn test
+        run: yarn cy-test
 
   ui-test-failure-notification:
     name: UI test failure notification
@@ -49,8 +53,7 @@ jobs:
           username: Aha-Actions-Bot
           password: jZCfo1jeJEAqV8ps7myugw
           subject: ${{github.repository}} - UI Test Failure - Github Actions
-          # to: aha_team@dgroup.co
           to: thaintp@dgroup.co
           from: Aha-Actions-Bot <aha-actions-bot@dgroup.co>
           body:
-            ${{github.actor}}'s commit make ${{github.repository}} - UI Test Failed
+            ${{github.repository}} - UI Test Failed
