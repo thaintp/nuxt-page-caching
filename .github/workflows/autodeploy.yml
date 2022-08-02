@@ -32,26 +32,10 @@ jobs:
       - name: Run tests
         run: yarn cy-test
 
-  ui-test-failure-notification:
-    name: UI test failure notification
+  update-image:
+    name: Update image
     runs-on: ubuntu-latest
 
-    if: ${{ always() && needs.ui-test.result == 'failure' }}
-    needs: [ui-test]
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Send mail
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.mandrillapp.com
-          server_port: 465
-          username: Aha-Actions-Bot
-          password: jZCfo1jeJEAqV8ps7myugw
-          subject: ${{github.repository}} - UI Test Failure - Github Actions
-          to: thaintp@dgroup.co
-          from: Aha-Actions-Bot <aha-actions-bot@dgroup.co>
-          body:
-            ${{github.repository}} - UI Test Failed
+      - name: Try to fail
+        run: exit 1
