@@ -1,4 +1,4 @@
-name: E2E Testing
+name: Autodeploy
 
 on:
   push:
