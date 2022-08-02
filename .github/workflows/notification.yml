@@ -1,0 +1,38 @@
+name: Notification
+
+on:
+  workflow_run:
+    types: [completed]
+
+jobs:
+  log-event:
+    name: Log event
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+
+  failure-notification:
+    name: UI test failure notification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.mandrillapp.com
+          server_port: 465
+          username: Aha-Actions-Bot
+          password: jZCfo1jeJEAqV8ps7myugw
+          subject: ${{github.repository}} - UI Test Failure - Github Actions
+          to: thaintp@dgroup.co
+          from: Aha-Actions-Bot <aha-actions-bot@dgroup.co>
+          body:
+            ${{github.repository}} - UI Test Failed
