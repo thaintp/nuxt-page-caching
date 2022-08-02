@@ -1,8 +1,6 @@
 name: E2E Testing
 
-on:
-  repository_dispatch:
-    types: [ahadev-sync-success]
+on: workflow_dispatch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
