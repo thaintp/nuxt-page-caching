@@ -29,8 +29,8 @@ modules: [
         return {
           key: "my-home-page",
           expire: 60 * 60,
-          nocache: route.includes("nocache=1"),
-        }; //1hour
+          renewCache: route.includes("nocache=1"),
+        }; // 1 hour
       },
     },
   ],
@@ -39,23 +39,23 @@ modules: [
 
 ## Options
 
-| Property               | Type     | Required? | Description                                                             |
-| :--------------------- | :------- | :-------- | :---------------------------------------------------------------------- |
-| disable                | boolean  | no        | default is `true` you can disable all module features                   |
-| appendHost             | boolean  | no        | default is `true` append host to the key                                |
-| ignoreConnectionErrors | boolean  | no        | default is `false` ignore connection errors and render data as normal   |
-| prefix                 | string   | no        | default is `r-` it's redis prefix key                                   |
-| url                    | string   | no        | default is `redis://127.0.0.1:6379` url for redis connection            |
+| Property               | Type     | Required? | Description                                                                         |
+| :--------------------- | :------- | :-------- | :---------------------------------------------------------------------------------- |
+| disable                | boolean  | no        | default is `true` you can disable all module features                               |
+| appendHost             | boolean  | no        | default is `true` append host to the key                                            |
+| ignoreConnectionErrors | boolean  | no        | default is `false` ignore connection errors and render data as normal               |
+| prefix                 | string   | no        | default is `r-` it's redis prefix key                                               |
+| url                    | string   | no        | default is `redis://127.0.0.1:6379` url for redis connection                        |
 | getCacheData           | function | yes       | should return `getCacheDataResponse`, if return `false` the page will not be cached |
 
 ## getCacheDataResponse
 
-| Property | Type    | Required? | Description                                                                                                            |
-| :------- | :------ | :-------- | :--------------------------------------------------------------------------------------------------------------------- |
-| key      | string  | no        | redis cache key, default is `empty`                                                                                    |
-| expire   | number  | no        | redis cache exp time in seconds                                                                                        |
-| nocache  | boolean | no        | set to `true` if don't want to render cached data, also set newest data to redis for others to use, default is `false` |
-| url      | string  | no        | redis uri, to save data to other redis server, default is `empty`                                                      |
+| Property   | Type    | Required? | Description                                                                                                            |
+| :--------- | :------ | :-------- | :--------------------------------------------------------------------------------------------------------------------- |
+| key        | string  | no        | redis cache key, default is `empty`                                                                                    |
+| expire     | number  | no        | redis cache exp time in seconds                                                                                        |
+| renewCache | boolean | no        | set to `true` if don't want to render cached data, also set newest data to redis for others to use, default is `false` |
+| url        | string  | no        | redis uri, to save data to other redis server, default is `empty`                                                      |
 
 ## Caveat
 

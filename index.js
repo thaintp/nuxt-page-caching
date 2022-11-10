@@ -4,6 +4,11 @@ import RedisStore from "./lib/RedisStore";
 import { serialize, deserialize } from "./lib/serializer";
 import getKey from "./lib/getKey";
 
+function isValidResult({ html }) {
+  // Nuxt generated valid layout
+  return (html || "").includes('id="webpage-main-content"');
+}
+
 export default function index({
   getCacheData,
   url = "redis://127.0.0.1:6379",
@@ -22,24 +27,23 @@ export default function index({
       if (!cacheData || disable) return renderRoute(route, context);
 
       // eslint-disable-next-line prefer-const
-      let { key, expire, nocache } = cacheData;
+      let { key, expire, renewCache } = cacheData;
 
-      const redisStore = new RedisStore(
-        cacheData.url || url,
-        false,
-        prefix,
-        true,
-        ignoreConnectionErrors
-      );
+      const useRedisStore = () =>
+        new RedisStore(
+          cacheData.url || url,
+          false,
+          prefix,
+          true,
+          ignoreConnectionErrors
+        );
 
       function renderAndSetCacheKey() {
         return renderRoute(route, context).then(async function (result) {
-          if (!result.error && !result.redirected) {
-            await redisStore.write(
-              getKey({ appendHost, req: context.req, key }),
-              serialize(result),
-              expire
-            );
+          if (isValidResult(result) && !result.error && !result.redirected) {
+            const redisKey = getKey({ appendHost, req: context.req, key });
+            const value = serialize(result);
+            await useRedisStore().write(redisKey, value, expire, true);
           }
           return result;
         });
@@ -47,17 +51,17 @@ export default function index({
 
       return new Promise(async (resolve) => {
         try {
-          const cachedResult = await redisStore.read(key);
-          if (cachedResult && !nocache) {
-            resolve(deserialize(cachedResult));
-          } else {
-            resolve(renderAndSetCacheKey());
+          const cachedResult = await useRedisStore().read(key, true);
+          if (cachedResult && !renewCache) {
+            const deserialized = deserialize(cachedResult);
+            if (isValidResult(deserialized)) {
+              return resolve(deserialized);
+            }
           }
+          resolve(renderAndSetCacheKey());
         } catch {
           resolve(renderRoute(route, context));
         }
-      }).finally(() => {
-        redisStore.disconnect();
       });
     };
   });
