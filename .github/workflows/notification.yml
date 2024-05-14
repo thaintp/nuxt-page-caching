@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Dump GitHub context
+      - name: GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
@@ -35,5 +35,4 @@ jobs:
           subject: ${{github.repository}} - UI Test Failure - Github Actions
           to: thaintp@dgroup.co
           from: Aha-Actions-Bot <aha-actions-bot@dgroup.co>
-          body:
-            ${{github.repository}} - UI Test Failed
+          body: ${{github.repository}} - UI Test Failed
